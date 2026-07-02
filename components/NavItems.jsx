@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 
 const navItems=[
     {
-        label:'Home', href:'/'
+        label:'Home', href:'/home'
     },
     {
         label:'Companions', href:'/companions'
@@ -17,7 +17,7 @@ const navItems=[
 const NavItems=()=>{
     const pathname=usePathname();
     return(
-        <nav className="flex items-center gap-4">
+        <nav className="flex items-center gap-4 max-sm:hidden">
             {navItems.map(({label, href})=>(
                <Link href={href} key={label} className={cn(pathname ===href && 'text-primary font-semibold')}>{label}</Link> 
             ))}
