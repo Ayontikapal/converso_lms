@@ -95,7 +95,7 @@ const CompanionComponent = ({ companionId, subject, topic, name, userName, userI
     }
 
     return (
-        <section className="flex flex-col">
+        <section className="flex flex-col h-screen">
             <section className="flex gap-8 max-sm:flex-col">
                 <div className="companion-section">
                     <div className="companion-avatar" style={{ backgroundColor: getSubjectColor(subject)}}>
