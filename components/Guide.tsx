@@ -21,7 +21,7 @@ const Guide = () => {
           {steps.map(({ title, description, icon:Icon, bg, src, alt}, index) => (
             <div 
               key={index} 
-              className="relative bg-white border-4 border-black rounded-[32px] p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden flex flex-col h-105"
+              className="guide-step"
             >
               <div className="relative z-10">
                 <div className={`${bg} border-2 border-black p-2.5 w-fit rounded-xl mb-4 mt-4`}>
@@ -32,7 +32,7 @@ const Guide = () => {
                   {description}
                 </p>
               </div>
-              <div className="absolute bottom-0 left-4 right-4 h-52 rounded-t-xl border-t-2 border-x-2 border-black/10 overflow-hidden bg-neutral-50">
+              <div className="guide-image">
                 <Image 
                   src={src} 
                   alt={alt} 
