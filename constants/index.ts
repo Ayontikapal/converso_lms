@@ -81,7 +81,7 @@ export const steps = [
   },
   {
     title: "Analyze Session Logs",
-    description: "Review structured complete markdown text transcripts and recent sessions history to track older conversations.",
+    description: "Review completed recent sessions history to track older conversations.",
     icon: BookOpenCheck,
     bg: "bg-blue-200",
     src: "/images/companions.png",
@@ -116,6 +116,6 @@ export const featuresData = [
       icon: FolderHeart,
       iconBg: 'bg-green-200',
       title: 'Saved sessions',
-      description: 'Never lose your progress. All of your past audio sessions and audio transcripts are securely kept so you can review them later.'
+      description: 'Never lose your progress. All of your past sessions and companions are securely kept so you can review them later.'
     }
   ];
