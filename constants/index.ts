@@ -1,4 +1,4 @@
-import {Plus, Mic, BookOpenCheck} from "lucide-react"
+import {Plus, Mic, BookOpenCheck, BrainCircuit, BookOpen, Clock, FolderHeart} from "lucide-react"
 export const subjects = [
   "maths",
   "language",
@@ -88,3 +88,34 @@ export const steps = [
     alt: "Companions"
   }
 ];
+
+export const featuresData = [
+    {
+      id: 'question-ai',
+      icon: BrainCircuit,
+      iconBg: 'bg-[#fccc41]', 
+      title: 'Question your AI Companion',
+      description: 'Have natural, back-and-forth voice conversations with your tutor to quiz yourself, ask questions, and fix confusing topics on the spot.'
+    },
+    {
+      id: 'study-guide',
+      icon: BookOpen,
+      iconBg: 'bg-[#e9d5ff]',
+      title: 'Get your own Study guide',
+      description: 'Customize your personal AI companion so you can learn exactly what you need to study with customisable voice style.'
+    },
+    {
+      id: 'flexible-learning',
+      icon: Clock,
+      iconBg: 'bg-[#fbcfe8]',
+      title: 'Flexible learning time',
+      description: 'Study whenever you want. Start a quick 4-minute check-in while riding the bus or jump into a deep 30-minute full lesson at your desk.'
+    },
+    {
+      id: 'saved-sessions',
+      icon: FolderHeart,
+      iconBg: 'bg-green-200',
+      title: 'Saved sessions',
+      description: 'Never lose your progress. All of your past audio sessions and audio transcripts are securely kept so you can review them later.'
+    }
+  ];
