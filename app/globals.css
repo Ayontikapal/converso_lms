@@ -239,10 +239,10 @@ body {
     @apply bg-black text-white text-xs font-bold uppercase px-3 py-1 rounded-4xl w-fit mx-auto border border-black
   }
   .guide-step{
-    @apply absolute -top-5 -left-3 text-black border-2 border-black font-black text-xl size-10 flex items-center justify-center rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]
+    @apply relative bg-white border-4 border-black rounded-[32px] p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden flex flex-col h-105
   }
-  .guide-border{
-    @apply bg-white border-2 border-black p-6 rounded-4xl shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] relative max-lg:mx-15;
+  .guide-image{
+    @apply absolute bottom-0 left-4 right-4 h-52 rounded-t-xl border-t-2 border-x-2 border-black/10 overflow-hidden bg-neutral-50
   }
   .feature-shadow{
     @apply shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] border-2 border-black;

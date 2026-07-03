@@ -4,9 +4,9 @@ const Footer = () => {
         <div className="footer">
           <div>©2026 Converso. All rights reserved.</div>
           <div className="flex gap-6">
-            <a href="#" className="footer-link">Privacy Policy</a>
-            <a href="#" className="footer-link">Terms of Service</a>
-            <a href="#" className="footer-link">Contact Support</a>
+            {['Privacy Policy', 'Terms of Service', 'Contact Support'].map((item, i) => (
+              <a key={i} href="#" className="footer-link">{item}</a>
+            ))}
           </div>
         </div>
       </footer>

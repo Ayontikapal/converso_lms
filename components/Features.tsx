@@ -1,10 +1,11 @@
 import { BrainCircuit, BookOpen, Clock, FolderHeart } from 'lucide-react';
+import Image from 'next/image';
 
 const Features = () => {
   return (
-    <main id="features" className="flex flex-col gap-8 h-screen justify-center items-center">
+    <main id="features" className="max-md:h-fit h-screen flex flex-col gap-8 mb-10 mx-5 justify-center items-center">
         <div className="flex flex-col gap-3">
-          <h2 className="text-4xl font-black">
+          <h2 className="text-4xl font-black max-md:text-2xl text-center">
             Everything You Need to Learn In One Place
           </h2>
           <p className="text-neutral-600 font-semibold text-sm text-center">

@@ -1,58 +1,53 @@
-import { Plus,Mic, Award } from "lucide-react";
+import Image from "next/image";
+import {steps} from "@/constants/index"
 
 const Guide = () => {
   return (
-    <section id="guide" className="bg-[#fbcfe8] h-fit border-t border-b border-black py-16">
-        <div className="rounded-2xl">
-          <div className="text-center max-w-xl mx-auto flex flex-col gap-2 mb-12 ">
-            <span className="guide-badge">
-              Simple Protocol
-            </span>
-            <h2 className="text-4xl font-black text-black">Three steps to mastery</h2>
-            <p className="text-neutral-800 font-semibold">How to deploy an optimized instance for your dynamic stack.</p>
-          </div>
+    <section id="guide" className="bg-[#fbcfe8] h-fit border-t-4 border-b-4 border-black py-20 px-4">
+      <div className="max-w-6xl mx-auto">
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="guide-border">
-              <div className="bg-yellow-400 guide-step">
-                1
-              </div>
-              <div className="bg-neutral-100 border border-black p-3 w-fit rounded-2xl mb-4 mt-2">
-                <Plus className="w-6 h-6 text-black stroke-[2.5]" />
-              </div>
-              <h4 className="text-xl font-bold text-black mb-2">Configure & Personalize</h4>
-              <p className="text-sm text-neutral-600 font-semibold">
-                Pick a target subject, unique voice profile, and structural personality layout.
-              </p>
-            </div>
-            <div className="guide-border">
-              <div className="bg-purple-200 guide-step">
-                2
-              </div>
-              <div className="bg-neutral-100 border border-black p-3 w-fit rounded-2xl mb-4 mt-2">
-                <Mic className="w-6 h-6 text-black" />
-              </div>
-              <h4 className="text-xl font-bold text-black mb-2">Engage in Voice Micro-Lessons</h4>
-              <p className="text-sm text-neutral-600 font-semibold leading-relaxed">
-                Launch interactive continuous streams. Converse fluidly as the core agent adapts in real time to your inputs, pacing, and blind spots.
-              </p>
-            </div>
-            <div className="guide-border">
-              <div className="bg-blue-200 guide-step">
-                3
-              </div>
-              <div className="bg-neutral-100 border border-black p-3 w-fit rounded-2xl mb-4 mt-2">
-                <Award className="w-6 h-6 text-black" />
-              </div>
-              <h4 className="text-xl font-bold text-black mb-2">Analyze Session Logs</h4>
-              <p className="text-sm text-neutral-600 font-semibold leading-relaxed">
-                Review structured complete markdown text transcripts and recent sessions history to track older conversations.
-              </p>
-            </div>
-          </div>
+        <div className="text-center max-w-xl mx-auto flex flex-col gap-3 mb-16">
+          <span className="guide-badge">
+            Simple Protocol
+          </span>
+          <h2 className="text-4xl md:text-5xl font-black text-black tracking-tight">
+            Three steps to mastery
+          </h2>
+          <p className="text-neutral-900 font-bold text-sm md:text-base">
+            How to deploy an optimized instance for your dynamic stack.
+          </p>
         </div>
-      </section>
-  )
-}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {steps.map(({ title, description, icon:Icon, bg, src, alt}, index) => (
+            <div 
+              key={index} 
+              className="relative bg-white border-4 border-black rounded-[32px] p-6 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden flex flex-col h-105"
+            >
+              <div className="relative z-10">
+                <div className={`${bg} border-2 border-black p-2.5 w-fit rounded-xl mb-4 mt-4`}>
+                  <Icon className="w-5 h-5 text-black" />
+                </div>
+                <h4 className="text-xl font-black text-black mb-2">{title}</h4>
+                <p className="text-xs text-neutral-600 font-semibold leading-relaxed">
+                  {description}
+                </p>
+              </div>
+              <div className="absolute bottom-0 left-4 right-4 h-52 rounded-t-xl border-t-2 border-x-2 border-black/10 overflow-hidden bg-neutral-50">
+                <Image 
+                  src={src} 
+                  alt={alt} 
+                  fill
+                  className="object-cover object-top"
+                />
+                <div className="absolute inset-0 bg-linear-to-t from-white via-white/10 to-transparent" />
+              </div>
+            </div>
+          ))}
+        </div>
 
-export default Guide
+      </div>
+    </section>
+  );
+};
+
+export default Guide;

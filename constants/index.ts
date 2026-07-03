@@ -1,3 +1,4 @@
+import {Plus, Mic, BookOpenCheck} from "lucide-react"
 export const subjects = [
   "maths",
   "language",
@@ -21,53 +22,69 @@ export const voices = {
   female: { casual: "ZIlrSGI4jZqobxRKprJz", formal: "sarah" },
 };
 
-export const recentSessions = [
+export const plans = [
   {
-    id: "1",
-    subject: "science",
-    name: "Neura the Brainy Explorer",
-    topic: "Neural Network of the Brain",
-    duration: 45,
-    color: "#E5D0FF",
+    name: "Basic Plan",
+    desc: "Perfect for testing the waters",
+    monthlyPrice: 0,
+    annualPrice: 0,
+    tag: "Active",
+    features: ["10 Conversations/month", "3 Active companions", "Basic Session Recaps"],
   },
   {
-    id: "2",
-    subject: "maths",
-    name: "Countsy the Number Wizard",
-    topic: "Derivatives & Integrals",
-    duration: 30,
-    color: "#FFDA6E",
+    name: "Core Learner",
+    desc: "Our most popular study configuration",
+    monthlyPrice: 25,
+    annualPrice: 19,
+    tag: "Best Plan",
+    features: [
+      "Everything in Basic",
+      "Unlimited Conversations",
+      "10 Active companions",
+      "Monthly progress reports",
+      "Save conversation history",
+      "Inline Quizzes and Recaps",
+    ],
   },
   {
-    id: "3",
-    subject: "language",
-    name: "Verba the Vocabulary Builder",
-    topic: "English Literature",
-    duration: 30,
-    color: "#BDE7FF",
+    name: "Pro Companion",
+    desc: "Your personal AI powered academy",
+    monthlyPrice: 45,
+    annualPrice: 39,
+    features: [
+      "Everything in Core",
+      "Unlimited Companions",
+      "Full Performance Dashboard",
+      "Early Access to new Features",
+      "Daily Learning Reminders",
+      "Priority Support",
+    ],
+  },
+];
+
+export const steps = [
+  {
+    title: "Configure & Personalize",
+    description: "Pick a target subject, unique voice profile, and structural personality layout.",
+    icon: Plus,
+    bg: "bg-yellow-300",
+    src: "/images/companion.png",
+    alt: "Companion"
   },
   {
-    id: "4",
-    subject: "coding",
-    name: "Codey the Logic Hacker",
-    topic: "Intro to If-Else Statements",
-    duration: 45,
-    color: "#FFC8E4",
+    title: "Engage in Voice Micro-Lessons",
+    description: "Launch interactive continuous streams. Converse fluidly as the core agent adapts in real time to your pacing.",
+    icon: Mic,
+    bg: "bg-purple-200",
+    src: "/images/session1.png",
+    alt: "Session"
   },
   {
-    id: "5",
-    subject: "history",
-    name: "Memo, the Memory Keeper",
-    topic: "World Wars: Causes & Consequences",
-    duration: 15,
-    color: "#FFECC8",
-  },
-  {
-    id: "6",
-    subject: "economics",
-    name: "The Market Maestro",
-    topic: "The Basics of Supply & Demand",
-    duration: 10,
-    color: "#C8FFDF",
-  },
+    title: "Analyze Session Logs",
+    description: "Review structured complete markdown text transcripts and recent sessions history to track older conversations.",
+    icon: BookOpenCheck,
+    bg: "bg-blue-200",
+    src: "/images/companions.png",
+    alt: "Companions"
+  }
 ];
