@@ -1,5 +1,3 @@
-"use server";
-
 import { auth } from "@clerk/nextjs/server";
 import { createSupabaseClient } from "@/lib/supabase";
 
@@ -91,7 +89,7 @@ export const getUserSessions =async(userId:string, limit=10)=>{
     return data.map(({companions})=>companions);
 }
 
-export const getUserCompanions =async(userId:string, limit=10)=>{
+export const getUserCompanions =async(userId:string)=>{
     const supabase=createSupabaseClient();
     const {data,error} =await supabase
         .from('companions')

@@ -1,10 +1,3 @@
-// type User = {
-//   name: string;
-//   email: string;
-//   image?: string;
-//   accountId: string;
-// };
-
 enum Subject {
   maths = "maths",
   language = "language",
@@ -23,7 +16,6 @@ type Companion = Models.DocumentList<Models.Document> & {
   subject: Subject;
   topic: string;
   duration: number;
-  bookmarked: boolean;
 };
 
 interface CreateCompanion {
