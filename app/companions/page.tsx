@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import {getAllCompanions} from "@/lib/actions/companion.actions";
 import CompanionCard from "@/components/CompanionCard";
 import {getSubjectColor} from "@/lib/utils";
@@ -16,18 +17,26 @@ const CompanionsLibrary = async ({ searchParams }: SearchParams) => {
             <section className="flex justify-between gap-4 max-sm:flex-col">
                 <h1>Companion Library</h1>
                 <div className="flex gap-4">
-                    <SearchInput />
-                    <SubjectFilter/>
+                    <Suspense fallback={<div className="text-sm text-neutral-500">Loading search...</div>}>
+                        <SearchInput />
+                    </Suspense>
+                    <Suspense fallback={<div className="text-sm text-neutral-500">Loading filters...</div>}>
+                        <SubjectFilter/>
+                    </Suspense>
                 </div>
             </section>
             <section className="companions-grid">
-                {companions.map((companion) => (
-                    <CompanionCard
-                        key={companion.id}
-                        {...companion}
-                        color={getSubjectColor(companion.subject)}
-                    />
-                ))}
+                {companions && companions.length > 0 ? (
+                    companions.map((companion) => (
+                        <CompanionCard
+                            key={companion.id}
+                            {...companion}
+                            color={getSubjectColor(companion.subject)}
+                        />
+                    ))
+                ) : (
+                    <p className="text-muted-foreground text-sm col-span-full">No companions found.</p>
+                )}
             </section>
         </main>
     )

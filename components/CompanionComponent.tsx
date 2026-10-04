@@ -22,6 +22,7 @@ const CompanionComponent = ({ companionId, subject, topic, name, userName, userI
     const [messages, setMessages] = useState<SavedMessage[]>([]);
 
     const lottieRef = useRef<LottieRefCurrentProps>(null);
+    const sessionSavedRef = useRef(false);
 
     useEffect(() => {
         if(lottieRef) {
@@ -33,12 +34,25 @@ const CompanionComponent = ({ companionId, subject, topic, name, userName, userI
         }
     }, [isSpeaking, lottieRef])
 
+    const recordSession = async () => {
+        if (sessionSavedRef.current) return;
+        sessionSavedRef.current = true;
+        try {
+            await addToSessionHistory(companionId);
+        } catch (err) {
+            console.error("Failed to record session history:", err);
+        }
+    };
+
     useEffect(() => {
-        const onCallStart = () => setCallStatus(CallStatus.ACTIVE);
+        const onCallStart = () => {
+            sessionSavedRef.current = false;
+            setCallStatus(CallStatus.ACTIVE);
+        };
 
         const onCallEnd = () => {
             setCallStatus(CallStatus.FINISHED);
-            addToSessionHistory(companionId)
+            recordSession();
         }
 
         const onMessage = (message: Message) => {
@@ -68,7 +82,7 @@ const CompanionComponent = ({ companionId, subject, topic, name, userName, userI
             vapi.off('speech-start', onSpeechStart);
             vapi.off('speech-end', onSpeechEnd);
         }
-    }, []);
+    }, [companionId]);
 
     const toggleMicrophone = () => {
         const isMuted = vapi.isMuted();
@@ -77,6 +91,7 @@ const CompanionComponent = ({ companionId, subject, topic, name, userName, userI
     }
 
     const handleCall = async () => {
+        sessionSavedRef.current = false;
         setCallStatus(CallStatus.CONNECTING)
 
         const assistantOverrides = {
@@ -89,9 +104,10 @@ const CompanionComponent = ({ companionId, subject, topic, name, userName, userI
         vapi.start(configureAssistant(voice, style), assistantOverrides)
     }
 
-    const handleDisconnect = () => {
+    const handleDisconnect = async () => {
         setCallStatus(CallStatus.FINISHED)
         vapi.stop()
+        await recordSession();
     }
 
     return (
@@ -105,7 +121,7 @@ const CompanionComponent = ({ companionId, subject, topic, name, userName, userI
                                 'absolute transition-opacity duration-1000', callStatus === CallStatus.FINISHED || callStatus === CallStatus.INACTIVE ? 'opacity-100' : 'opacity-0', callStatus === CallStatus.CONNECTING && 'opacity-100 animate-pulse'
                             )
                         }>
-                            <Image src={`/icons/${subject}.svg`} alt={subject} width={150} height={150} className="max-sm:w-fit" />
+                            <Image src={`/icons/${subject?.toLowerCase()}.svg`} alt={subject} width={150} height={150} className="max-sm:w-fit" />
                         </div>
 
                         <div className={cn('absolute transition-opacity duration-1000', callStatus === CallStatus.ACTIVE ? 'opacity-100': 'opacity-0')}>
@@ -122,9 +138,9 @@ const CompanionComponent = ({ companionId, subject, topic, name, userName, userI
 
                 <div className="user-section">
                     <div className="user-avatar">
-                        <Image src={userImage} alt={userName} width={130} height={130} className="rounded-lg" />
+                        <Image src={userImage || '/icons/check.svg'} alt={userName || 'User'} width={130} height={130} className="rounded-lg object-cover" />
                         <p className="font-bold text-2xl">
-                            {userName}
+                            {userName || 'User'}
                         </p>
                     </div>
                     <button className="btn-mic" onClick={toggleMicrophone} disabled={callStatus !== CallStatus.ACTIVE}>
@@ -133,12 +149,12 @@ const CompanionComponent = ({ companionId, subject, topic, name, userName, userI
                             {isMuted ? 'Turn on microphone' : 'Turn off microphone'}
                         </p>
                     </button>
-                    <button className={cn('rounded-lg py-2 cursor-pointer transition-colors w-full text-white', callStatus ===CallStatus.ACTIVE ? 'bg-red-700' : 'bg-primary', callStatus === CallStatus.CONNECTING && 'animate-pulse')} onClick={callStatus === CallStatus.ACTIVE ? handleDisconnect : handleCall}>
+                    <button className={cn('rounded-lg py-2 cursor-pointer transition-colors w-full text-white font-semibold', callStatus === CallStatus.ACTIVE ? 'bg-red-700 hover:bg-red-800' : 'bg-primary hover:bg-neutral-800', callStatus === CallStatus.CONNECTING && 'animate-pulse')} onClick={callStatus === CallStatus.ACTIVE ? handleDisconnect : handleCall}>
                         {callStatus === CallStatus.ACTIVE
-                        ? "End Session"
-                        : callStatus === CallStatus.CONNECTING
-                            ? 'Connecting'
-                        : 'Start Session'
+                            ? "End Session"
+                            : callStatus === CallStatus.CONNECTING
+                                ? 'Connecting...'
+                                : 'Start Session'
                         }
                     </button>
                 </div>
@@ -147,19 +163,19 @@ const CompanionComponent = ({ companionId, subject, topic, name, userName, userI
             <section className="transcript">
                 <div className="transcript-message no-scrollbar">
                     {messages.map((message, index) => {
-                        if(message.role === 'assistant') {
+                        if (message.role === 'assistant') {
                             return (
                                 <p key={index} className="text-lg max-sm:text-sm">
                                     {
-                                        name
+                                        (name || 'Companion')
                                             .split(' ')[0]
-                                            .replace('/[.,]/g, ','')
+                                            .replace(/[.,]/g, '')
                                     }: {message.content}
                                 </p>
                             )
                         } else {
-                           return <p key={index} className="text-lg max-sm:text-sm">
-                                {userName}: {message.content}
+                            return <p key={index} className="text-lg max-sm:text-sm">
+                                {userName || 'User'}: {message.content}
                             </p>
                         }
                     })}

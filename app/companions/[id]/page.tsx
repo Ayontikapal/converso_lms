@@ -8,24 +8,22 @@ interface CompanionSessionPageProps{
     params: Promise<{id:string}>;
 }  //using params since we are using dynamic route [id] in the path
 
-const CompanionSession=async ({params}:CompanionSessionPageProps)=>{
-    const {id}= await params;
-    const companion =await getCompanion(id);
-    const user= await currentUser();
+const CompanionSession = async ({ params }: CompanionSessionPageProps) => {
+    const { id } = await params;
+    const user = await currentUser();
+    if (!user) redirect('/sign-in');
 
-    const {name, subject, topic, duration}=companion;
+    const companion = await getCompanion(id);
+    if (!companion) redirect('/companions');
 
-    if(!user) redirect('/sign-in');
-    if(!companion) redirect('/companions');
+    const { name, subject, topic, duration } = companion;
 
-    console.log('companion', companion);
-
-    return(
+    return (
         <main>
             <article className="flex rounded-border justify-between p-6 max-md:flex-col">
                 <div className="flex items-center gap-2">
-                    <div className="size-18 flex items-center justify-center rounded-lg max-md:hidden" style={{backgroundColor:getSubjectColor(companion.subject)}}>
-                        <Image src={`/icons/${subject}.svg`} alt={subject} width={35} height={35}/>
+                    <div className="size-18 flex items-center justify-center rounded-lg max-md:hidden" style={{ backgroundColor: getSubjectColor(companion.subject) }}>
+                        <Image src={`/icons/${subject?.toLowerCase()}.svg`} alt={subject || 'subject'} width={35} height={35} />
                     </div>
                     <div className="flex flex-col gap-2">
                         <div className="flex items-center gap-2">
@@ -43,10 +41,11 @@ const CompanionSession=async ({params}:CompanionSessionPageProps)=>{
                     {duration} mins
                 </div>
             </article>
-            <CompanionComponent {...companion}
-            companionId={id}
-            userName={user.firstName!}
-            userImage={user.imageUrl!}
+            <CompanionComponent
+                {...companion}
+                companionId={id}
+                userName={user.firstName || user.username || 'User'}
+                userImage={user.imageUrl || '/icons/check.svg'}
             />
         </main>
     )

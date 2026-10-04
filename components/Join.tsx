@@ -24,8 +24,8 @@ const Join = () => {
               </div>
               <h4 className="font-extrabold text-black text-lg">Claim your AI study guide</h4>
             </div>
-            <Link href="/sign-in" className="hero-button">
-                Sign Up 
+            <Link href="/companions/new" className="hero-button">
+                Get Started
                 <ArrowUpRight className="w-4 h-4" />
             </Link>
 

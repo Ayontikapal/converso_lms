@@ -10,6 +10,8 @@ import { currentUser } from "@clerk/nextjs/server";
 import Image from "next/image";
 import { redirect } from "next/navigation";
 
+export const dynamic = 'force-dynamic';
+
 const Profile = async() => {
     const user =await currentUser();
     if(!user) redirect('/sign-in');
@@ -21,15 +23,15 @@ const Profile = async() => {
     <main className="lg:w-3/4">
       <section className="flex justify-between gap-4 max-md:flex-col items-center">
         <div className="flex gap-4 items-center">
-            <Image src={user.imageUrl} alt={user.firstName!} width={100} height={100}/>
-        <div className="flex flex-col gap-2">
-            <h1 className="font-bold text-2xl">
-                {user.firstName} {user.lastName}
-            </h1>
-            <p className="text-sm text-muted-foreground">
-                {user.emailAddresses[0].emailAddress}
-            </p>
-        </div>
+            <Image src={user.imageUrl || '/icons/check.svg'} alt={user.firstName || 'User'} width={100} height={100} className="rounded-full object-cover" />
+            <div className="flex flex-col gap-2">
+                <h1 className="font-bold text-2xl">
+                    {user.firstName || user.username || 'User'} {user.lastName || ''}
+                </h1>
+                <p className="text-sm text-muted-foreground">
+                    {user.emailAddresses?.[0]?.emailAddress || ''}
+                </p>
+            </div>
         </div>
         <div className="flex gap-4">
             <div className="border border-black rounded-lg p-3 gap-2 flex flex-col h-fit">

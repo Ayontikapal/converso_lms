@@ -16,9 +16,9 @@ const Hero = () => {
           Ditch static modules. Build personalized, hyper-focused AI study companions tailored to your syllabus, voice preference, and pace.
         </p>
         <div className="flex items-center gap-4 mt-4 max-sm:flex-col max-sm:w-fit">
-          <a href="/sign-in" className="hero-button">
+          <Link href="/companions/new" className="hero-button">
             Create your Own Companion
-          </a>
+          </Link>
           <Link href="#guide" className="border-2 border-black rounded-4xl font-bold px-8 py-4 max-sm:w-full scroll-smooth">
             See How It Works
           </Link>

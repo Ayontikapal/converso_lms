@@ -1,11 +1,20 @@
 "use client";
 import { useState } from "react";
 import { Check } from "lucide-react";
-import {plans} from "@/constants/index";
+import { plans } from "@/constants/index";
 import Link from "next/link";
+import { useUser } from "@clerk/nextjs";
 
 const Pricing = () => {
   const [isAnnual, setIsAnnual] = useState(true);
+  const [subscribedPlan, setSubscribedPlan] = useState<string | null>(null);
+  const { isSignedIn } = useUser();
+
+  const handleSubscribe = (planName: string) => {
+    if (isSignedIn) {
+      setSubscribedPlan(planName);
+    }
+  };
 
   return (
     <section id="pricing" className="bg-[#e9d5ff] border-t border-b-2 border-black py-20">
@@ -32,6 +41,7 @@ const Pricing = () => {
           {plans.map((plan) => {
             const isCore = plan.name === "Core Learner";
             const price = isAnnual ? plan.annualPrice : plan.monthlyPrice;
+            const isSubscribed = subscribedPlan === plan.name;
             return (
               <div 
                 key={plan.name}
@@ -78,15 +88,28 @@ const Pricing = () => {
                   <div className="mt-8 pt-4 h-13 flex items-center justify-center text-sm font-bold text-neutral-400 italic">
                     Free Workspace
                   </div>
+                ) : isSignedIn ? (
+                  <button 
+                    onClick={() => handleSubscribe(plan.name)}
+                    className={`w-full border-2 border-black py-3.5 rounded-xl font-black transition-transform active:translate-y-0.5 mt-8 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] ${
+                      isSubscribed
+                        ? 'bg-green-500 text-white'
+                        : isCore 
+                          ? 'bg-orange-500 text-white hover:bg-orange-600' 
+                          : 'bg-neutral-100 text-black hover:bg-neutral-200'
+                    }`}
+                  >
+                    {isSubscribed ? 'Plan Active ✓' : 'Subscribe'}
+                  </button>
                 ) : (
                   <Link href="/sign-in">
-                  <button className={`w-full border-2 border-black py-3.5 rounded-xl font-black transition-transform active:translate-y-0.5 mt-8 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] ${
-                    isCore 
-                      ? 'bg-orange-500 text-white hover:bg-orange-600' 
-                      : 'bg-neutral-100 text-black hover:bg-neutral-200'
-                  }`}>
-                    Subscribe
-                  </button>
+                    <button className={`w-full border-2 border-black py-3.5 rounded-xl font-black transition-transform active:translate-y-0.5 mt-8 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] ${
+                      isCore 
+                        ? 'bg-orange-500 text-white hover:bg-orange-600' 
+                        : 'bg-neutral-100 text-black hover:bg-neutral-200'
+                    }`}>
+                      Subscribe
+                    </button>
                   </Link>
                 )}
               </div>
