@@ -7,7 +7,9 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const getSubjectColor = (subject: string) => {
-  return subjectsColors[subject as keyof typeof subjectsColors];
+  if (!subject) return "#E5D0FF";
+  const key = subject.toLowerCase();
+  return subjectsColors[key as keyof typeof subjectsColors] || "#E5D0FF";
 };
 
 export const configureAssistant = (voice: string, style: string) => {

@@ -19,6 +19,8 @@ import { subjects } from "@/constants"
 import {createCompanion} from "@/lib/actions/companion.actions";
 import { useRouter } from "next/navigation"
 
+import { useState } from "react";
+
 const formSchema = z.object({
     name: z.string().min(1, { message: 'Companion is required.' }),
     subject: z.string().min(1, { message: 'Subject is required.' }),
@@ -30,6 +32,7 @@ const formSchema = z.object({
 
 const CompanionForm = () => {
     const router = useRouter();
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const {
         register,
         handleSubmit,
@@ -49,6 +52,7 @@ const CompanionForm = () => {
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
         try {
+            setIsSubmitting(true);
             const companion = await createCompanion(values);
 
             if (companion && companion.id) {
@@ -59,6 +63,8 @@ const CompanionForm = () => {
             }
         } catch (error) {
             console.error('Error creating companion:', error);
+        } finally {
+            setIsSubmitting(false);
         }
     }
 
@@ -165,8 +171,8 @@ const CompanionForm = () => {
                 <FieldError>{errors.duration?.message}</FieldError>
             </Field>
 
-            <Button type="submit" className="w-full cursor-pointer mb-5">
-                Build Your Companion
+            <Button type="submit" disabled={isSubmitting} className="w-full cursor-pointer mb-5">
+                {isSubmitting ? "Building Companion..." : "Build Your Companion"}
             </Button>
         </form>
     )

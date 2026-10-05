@@ -7,6 +7,7 @@ import Image from "next/image";
 import Lottie, {LottieRefCurrentProps} from "lottie-react";
 import soundwaves from '@/constants/soundwaves.json'
 import {addToSessionHistory} from "@/lib/actions/companion.actions";
+import {useRouter} from "next/navigation";
 
 enum CallStatus {
     INACTIVE = 'INACTIVE',
@@ -16,13 +17,14 @@ enum CallStatus {
 }
 
 const CompanionComponent = ({ companionId, subject, topic, name, userName, userImage, style, voice }: CompanionComponentProps) => {
+    const router = useRouter();
     const [callStatus, setCallStatus] = useState<CallStatus>(CallStatus.INACTIVE);
     const [isSpeaking, setIsSpeaking] = useState(false);
     const [isMuted, setIsMuted] = useState(false);
     const [messages, setMessages] = useState<SavedMessage[]>([]);
 
     const lottieRef = useRef<LottieRefCurrentProps>(null);
-    const sessionSavedRef = useRef(false);
+    const sessionPromiseRef = useRef<Promise<any> | null>(null);
 
     useEffect(() => {
         if(lottieRef) {
@@ -35,24 +37,30 @@ const CompanionComponent = ({ companionId, subject, topic, name, userName, userI
     }, [isSpeaking, lottieRef])
 
     const recordSession = async () => {
-        if (sessionSavedRef.current) return;
-        sessionSavedRef.current = true;
-        try {
-            await addToSessionHistory(companionId);
-        } catch (err) {
-            console.error("Failed to record session history:", err);
+        if (!sessionPromiseRef.current) {
+            sessionPromiseRef.current = (async () => {
+                try {
+                    const res = await addToSessionHistory(companionId);
+                    router.refresh();
+                    return res;
+                } catch (err) {
+                    console.error("Failed to record session history:", err);
+                }
+            })();
         }
+        return await sessionPromiseRef.current;
     };
 
     useEffect(() => {
         const onCallStart = () => {
-            sessionSavedRef.current = false;
+            sessionPromiseRef.current = null;
             setCallStatus(CallStatus.ACTIVE);
         };
 
-        const onCallEnd = () => {
+        const onCallEnd = async () => {
             setCallStatus(CallStatus.FINISHED);
-            recordSession();
+            await recordSession();
+            router.push('/my-journey');
         }
 
         const onMessage = (message: Message) => {
@@ -91,7 +99,7 @@ const CompanionComponent = ({ companionId, subject, topic, name, userName, userI
     }
 
     const handleCall = async () => {
-        sessionSavedRef.current = false;
+        sessionPromiseRef.current = null;
         setCallStatus(CallStatus.CONNECTING)
 
         const assistantOverrides = {
@@ -108,7 +116,45 @@ const CompanionComponent = ({ companionId, subject, topic, name, userName, userI
         setCallStatus(CallStatus.FINISHED)
         vapi.stop()
         await recordSession();
+        router.push('/my-journey');
     }
+
+    const [copied, setCopied] = useState(false);
+
+    const generateNotesText = () => {
+        let text = `# Session Notes: ${name}\n`;
+        text += `**Subject:** ${subject} | **Topic:** ${topic}\n`;
+        text += `**Date:** ${new Date().toLocaleDateString()}\n\n`;
+        text += `## Transcript\n`;
+        if (messages.length === 0) {
+            text += `*No transcript recorded during this session.*\n`;
+        } else {
+            messages.slice().reverse().forEach((msg) => {
+                const speaker = msg.role === 'assistant' ? (name || 'Companion').split(' ')[0] : (userName || 'User');
+                text += `**${speaker}:** ${msg.content}\n\n`;
+            });
+        }
+        return text;
+    };
+
+    const handleCopyTranscript = () => {
+        const notes = generateNotesText();
+        navigator.clipboard.writeText(notes);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
+
+    const handleExportMarkdown = () => {
+        const notes = generateNotesText();
+        const blob = new Blob([notes], { type: 'text/markdown;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `${(name || 'Session').replace(/\s+/g, '_')}_Notes.md`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
 
     return (
         <section className="flex flex-col h-screen">
@@ -157,28 +203,56 @@ const CompanionComponent = ({ companionId, subject, topic, name, userName, userI
                                 : 'Start Session'
                         }
                     </button>
+
+                    <div className="flex gap-2 w-full mt-2">
+                        <button
+                            type="button"
+                            onClick={handleCopyTranscript}
+                            className="flex-1 text-xs py-2 px-3 bg-neutral-100 hover:bg-neutral-200 border border-neutral-300 rounded-lg font-medium text-neutral-800 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                        >
+                            <Image src="/icons/check.svg" alt="copy" width={14} height={14} />
+                            {copied ? 'Copied!' : 'Copy Summary'}
+                        </button>
+                        <button
+                            type="button"
+                            onClick={handleExportMarkdown}
+                            className="flex-1 text-xs py-2 px-3 bg-neutral-100 hover:bg-neutral-200 border border-neutral-300 rounded-lg font-medium text-neutral-800 transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                        >
+                            Export Notes (.md)
+                        </button>
+                    </div>
                 </div>
             </section>
 
             <section className="transcript">
+                <div className="flex justify-between items-center mb-2 px-1">
+                    <span className="font-semibold text-sm text-neutral-700">Live Transcript & Notes</span>
+                    <span className="text-xs text-neutral-500">{messages.length} messages</span>
+                </div>
                 <div className="transcript-message no-scrollbar">
-                    {messages.map((message, index) => {
-                        if (message.role === 'assistant') {
-                            return (
-                                <p key={index} className="text-lg max-sm:text-sm">
-                                    {
-                                        (name || 'Companion')
-                                            .split(' ')[0]
-                                            .replace(/[.,]/g, '')
-                                    }: {message.content}
+                    {messages.length === 0 ? (
+                        <p className="text-muted-foreground text-sm italic">
+                            Start session to begin speaking with {name}...
+                        </p>
+                    ) : (
+                        messages.map((message, index) => {
+                            if (message.role === 'assistant') {
+                                return (
+                                    <p key={index} className="text-lg max-sm:text-sm">
+                                        {
+                                            (name || 'Companion')
+                                                .split(' ')[0]
+                                                .replace(/[.,]/g, '')
+                                        }: {message.content}
+                                    </p>
+                                )
+                            } else {
+                                return <p key={index} className="text-lg max-sm:text-sm">
+                                    {userName || 'User'}: {message.content}
                                 </p>
-                            )
-                        } else {
-                            return <p key={index} className="text-lg max-sm:text-sm">
-                                {userName || 'User'}: {message.content}
-                            </p>
-                        }
-                    })}
+                            }
+                        })
+                    )}
                 </div>
 
                 <div className="transcript-fade" />

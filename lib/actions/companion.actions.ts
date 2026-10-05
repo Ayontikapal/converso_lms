@@ -12,6 +12,10 @@ export const createCompanion=async(formData:CreateCompanion)=>{
         .select();
 
     if(error || !data) throw new Error(error?.message || 'Failed to create a companion');
+
+    revalidatePath('/companions');
+    revalidatePath('/my-journey');
+    revalidatePath('/home');
     return data[0];
 }
 
@@ -65,6 +69,7 @@ export const addToSessionHistory = async (companionId: string) => {
         .insert({
             companion_id: companionId,
             user_id: userId,
+            created_at: new Date().toISOString(),
         })
         .select();
 
@@ -75,6 +80,8 @@ export const addToSessionHistory = async (companionId: string) => {
 
     revalidatePath('/home');
     revalidatePath('/my-journey');
+    revalidatePath('/companions');
+    revalidatePath('/');
     return data;
 }
 
@@ -84,36 +91,54 @@ export const getRecentSessions = async (limit = 10) => {
     const supabase = createSupabaseClient();
     const { data, error } = await supabase
         .from('session_history')
-        .select(`companions:companion_id (*)`)
+        .select(`created_at, companions:companion_id (*)`)
         .eq("user_id", userId)
-        .order('created_at', { ascending: false })
-        .limit(limit);
+        .order('created_at', { ascending: false });
     if (error) {
         console.error("Error fetching recent sessions:", error.message);
         return [];
     }
 
-    return (data || [])
-        .map((item: any) => (Array.isArray(item.companions) ? item.companions[0] : item.companions))
-        .filter(Boolean);
+    const companions: Companion[] = [];
+    const seenIds = new Set<string>();
+
+    for (const item of data || []) {
+        const comp = Array.isArray(item.companions) ? item.companions[0] : item.companions;
+        if (comp && comp.id && !seenIds.has(comp.id)) {
+            seenIds.add(comp.id);
+            companions.push(comp);
+            if (companions.length >= limit) break;
+        }
+    }
+
+    return companions;
 }
 
 export const getUserSessions = async (userId: string, limit = 10) => {
     const supabase = createSupabaseClient();
     const { data, error } = await supabase
         .from('session_history')
-        .select(`companions:companion_id (*)`)
+        .select(`created_at, companions:companion_id (*)`)
         .eq('user_id', userId)
-        .order('created_at', { ascending: false })
-        .limit(limit);
+        .order('created_at', { ascending: false });
     if (error) {
         console.error("Error fetching user sessions:", error.message);
         return [];
     }
 
-    return (data || [])
-        .map((item: any) => (Array.isArray(item.companions) ? item.companions[0] : item.companions))
-        .filter(Boolean);
+    const companions: Companion[] = [];
+    const seenIds = new Set<string>();
+
+    for (const item of data || []) {
+        const comp = Array.isArray(item.companions) ? item.companions[0] : item.companions;
+        if (comp && comp.id && !seenIds.has(comp.id)) {
+            seenIds.add(comp.id);
+            companions.push(comp);
+            if (companions.length >= limit) break;
+        }
+    }
+
+    return companions;
 }
 
 export const getUserCompanions = async (userId: string) => {

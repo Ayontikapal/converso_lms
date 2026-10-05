@@ -7,12 +7,26 @@ import { useUser } from "@clerk/nextjs";
 
 const Pricing = () => {
   const [isAnnual, setIsAnnual] = useState(true);
-  const [subscribedPlan, setSubscribedPlan] = useState<string | null>(null);
+  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const { isSignedIn } = useUser();
 
-  const handleSubscribe = (planName: string) => {
-    if (isSignedIn) {
-      setSubscribedPlan(planName);
+  const handleSubscribe = async (planName: string, price: number) => {
+    if (!isSignedIn) return;
+    try {
+      setLoadingPlan(planName);
+      const res = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ planName, priceAmount: price }),
+      });
+      const data = await res.json();
+      if (data?.url) {
+        window.location.href = data.url;
+      }
+    } catch (err) {
+      console.error("Failed to start checkout:", err);
+    } finally {
+      setLoadingPlan(null);
     }
   };
 
@@ -41,7 +55,6 @@ const Pricing = () => {
           {plans.map((plan) => {
             const isCore = plan.name === "Core Learner";
             const price = isAnnual ? plan.annualPrice : plan.monthlyPrice;
-            const isSubscribed = subscribedPlan === plan.name;
             return (
               <div 
                 key={plan.name}
@@ -90,16 +103,17 @@ const Pricing = () => {
                   </div>
                 ) : isSignedIn ? (
                   <button 
-                    onClick={() => handleSubscribe(plan.name)}
+                    onClick={() => handleSubscribe(plan.name, price)}
+                    disabled={!!loadingPlan}
                     className={`w-full border-2 border-black py-3.5 rounded-xl font-black transition-transform active:translate-y-0.5 mt-8 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] ${
-                      isSubscribed
-                        ? 'bg-green-500 text-white'
+                      loadingPlan === plan.name
+                        ? 'bg-neutral-300 text-black cursor-wait'
                         : isCore 
                           ? 'bg-orange-500 text-white hover:bg-orange-600' 
                           : 'bg-neutral-100 text-black hover:bg-neutral-200'
                     }`}
                   >
-                    {isSubscribed ? 'Plan Active ✓' : 'Subscribe'}
+                    {loadingPlan === plan.name ? 'Processing...' : 'Subscribe'}
                   </button>
                 ) : (
                   <Link href="/sign-in">
