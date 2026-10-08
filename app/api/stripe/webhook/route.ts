@@ -3,15 +3,15 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createClerkClient } from "@clerk/nextjs/server";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "sk_test_dummy", {
   apiVersion: "2025-02-24.acacia" as any,
 });
 
-const clerkClient = createClerkClient({
-  secretKey: process.env.CLERK_SECRET_KEY,
-});
-
 export async function POST(req: Request) {
+  const clerkClient = createClerkClient({
+    secretKey: process.env.CLERK_SECRET_KEY || "sk_test_placeholder",
+  });
+
   const body = await req.text();
   const signature = (await headers()).get("Stripe-Signature") as string;
 
